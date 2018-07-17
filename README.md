@@ -3,6 +3,8 @@
 # RD3 - Playground for React & D3.js
 **[Live demo](https://rd3.now.sh)**
 
+**[My own live testbed](https://p3zjl1yr0j.codesandbox.io/)**
+
 *The demo instance may sleep when there is no traffic, if it takes time to load please hold on while the instance starts.*
 
 ## Description
