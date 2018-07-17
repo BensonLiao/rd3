@@ -41,78 +41,108 @@ const generateHoverCss = letter =>
 
 const Grid = styled(GridLayout)`
   .axis text {
-    fill: ${({theme}) => theme.color};
+    fill: ${({ theme }) => theme.color};
   }
   .axis path,
   .axis line {
     fill: none;
-    stroke: ${({theme}) => theme.color};
+    stroke: ${({ theme }) => theme.color};
     shape-rendering: crispEdges;
   }
   .stroked {
-    stroke: ${({theme}) => theme.color};
+    stroke: ${({ theme }) => theme.color};
   }
   .stroked-negative {
-    stroke: ${({theme}) => theme.background};
+    stroke: ${({ theme }) => theme.background};
   }
-  ${({colors}) => generateDataGroupCSS(colors)}
-  .data {
-    opacity: ${({hover}) => (hover ? 0.25 : 1)};
-    -webkit-transition: opacity .2s ease-in;
+  ${({ colors }) => generateDataGroupCSS(colors)} .data {
+    opacity: ${({ hover }) => (hover ? 0.25 : 1)};
+    -webkit-transition: opacity 0.2s ease-in;
   }
-  ${({hover}) => hover && hover.map(letter => generateHoverCss(letter))}
-  .tooltip {
+  ${({ hover }) =>
+    hover && hover.map(letter => generateHoverCss(letter))} .tooltip {
     position: absolute;
     z-index: 10;
     display: inline-block;
-    border: solid 1px ${({theme}) => theme.secondaryColor};
+    border: solid 1px ${({ theme }) => theme.secondaryColor};
     border-radius: 2px;
     padding: 5px;
-    background-color: ${({theme}) => transparentize(0.2, theme.secondaryBackground)};
+    background-color: ${({ theme }) =>
+      transparentize(0.2, theme.secondaryBackground)};
     text-align: center;
-    color: ${({theme}) => theme.secondaryColor};
+    color: ${({ theme }) => theme.secondaryColor};
   }
-`
+  .react-grid-item > .react-resizable-handle::after {
+    content: "";
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 5px;
+    height: 5px;
+    border-right: 2px solid
+      ${({ theme }) => transparentize(0.4, theme.secondaryBackground)};
+    border-bottom: 2px solid
+      ${({ theme }) => transparentize(0.4, theme.secondaryBackground)};
+  }
+`;
 
 class Dashboard extends React.Component {
+  static defaultProps = {
+    onLayoutChange: function() {},
+    cols: 12
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      layout: [
+        { i: "TL", x: 0, y: 0, w: 6, h: 7 },
+        { i: "TR", x: 6, y: 0, w: 6, h: 7 },
+        { i: "BL", x: 0, y: 0, w: 6, h: 5 },
+        { i: "BR", x: 6, y: 0, w: 6, h: 5 }
+      ]
+    };
+  }
+
   static propTypes = {
     colors: object,
     hover: arrayOf(string),
-    incrementRenderCount: func
-  }
+    incrementRenderCount: func,
+    onLayoutChange: func
+  };
 
   componentDidMount() {
-    this.props.incrementRenderCount('component')
-    window.addEventListener('resize', this.onWindowResize)
+    this.props.incrementRenderCount("component");
+    window.addEventListener("resize", this.onWindowResize);
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.props.incrementRenderCount('component')
+    this.props.incrementRenderCount("component");
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.onWindowResize)
+    window.removeEventListener("resize", this.onWindowResize);
   }
 
   onWindowResize = e => {
-    this.forceUpdate()
-  }
+    this.forceUpdate();
+  };
+
+  onLayoutChange = layout => {
+    this.props.onLayoutChange(layout);
+  };
 
   render() {
-    const {hover, colors} = this.props
-    const layout = [
-      {i: 'TL', x: 0, y: 0, w: 6, h: 7},
-      {i: 'TR', x: 6, y: 0, w: 6, h: 7},
-      {i: 'BL', x: 0, y: 7, w: 4, h: 5},
-      {i: 'BR', x: 4, y: 7, w: 8, h: 5}
-    ]
+    const { hover, colors } = this.props;
+    const { layout } = this.state;
     return (
       <Grid
+        {...this.props}
         className="dashboard"
         hover={hover}
         colors={colors}
         layout={layout}
-        cols={12}
+        onLayoutChange={this.onLayoutChange}
         rowHeight={(window.innerHeight - 29) / 12}
         margin={[0, 0]}
       >
@@ -129,8 +159,8 @@ class Dashboard extends React.Component {
           <MeasuredDemoChat />
         </div>
       </Grid>
-    )
+    );
   }
 }
 
-export default Dashboard
+export default Dashboard;
